@@ -1,9 +1,4 @@
 spring:
-  batch:
-    job:
-      enabled: false
-    jdbc:
-      initialize-schema: always
   config:
     import: optional:file:.env[.properties]
   datasource-meta:

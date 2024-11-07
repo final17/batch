@@ -1,7 +1,5 @@
 package org.sparta.batch.domain.waiting_statistics.shedule;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RAtomicLong;
@@ -27,7 +25,6 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@EnableBatchProcessing
 @RequiredArgsConstructor
 public class WaitingStatisticsJob {
 

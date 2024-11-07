@@ -14,7 +14,7 @@ import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
+@Entity(name="waiting_statistics")
 public class WaitingStatistics {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
