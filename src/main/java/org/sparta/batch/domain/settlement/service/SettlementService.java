@@ -37,6 +37,9 @@ public class SettlementService {
             JsonNode jsonNode;
             ObjectMapper mapper = new ObjectMapper();
             responseEntity = tossPaymentsService.settlements(startDate , endDate , page , size);
+
+            log.info("settlements 요청 결과 : {}" , responseEntity.getBody());
+
             responseBody = responseEntity.getBody();
             jsonNode = mapper.readTree(responseBody);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {

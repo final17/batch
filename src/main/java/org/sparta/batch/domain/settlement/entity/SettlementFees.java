@@ -20,4 +20,10 @@ public class SettlementFees {
 
     private String type;        // 결제 수수료의 상세정보
     private Long supplyAmount;  // 결제 수수료의 공급가액
+
+    public SettlementFees(Settlement settlement, String type, Long supplyAmount) {
+        this.settlement = settlement;
+        this.type = type;
+        this.supplyAmount = supplyAmount;
+    }
 }
