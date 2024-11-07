@@ -11,7 +11,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-public class BatchDataSourceConfig {
+public class MetaDBConfig {
 
     @Primary
     @Bean
