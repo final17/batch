@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class MetaDBConfig {
-
     @Primary
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource-meta")
@@ -23,7 +22,6 @@ public class MetaDBConfig {
     @Primary
     @Bean
     public PlatformTransactionManager metaTransactionManager() {
-
         return new DataSourceTransactionManager(metaDBSource());
     }
 }
