@@ -31,7 +31,7 @@ public class WaitingStatisticsJob {
     private final RedissonClient redisson;
     private final WaitingStatisticsRepository waitingStatisticsRepository;
 
-    @Bean
+    @Bean(name = "waitingJob")
     public Job watingCountJob(JobRepository jobRepository, Step waitingCountStep) {
         return new JobBuilder("waitingJob", jobRepository)
                 .start(waitingCountStep)

@@ -46,7 +46,7 @@ public class SettlementBatchConfig {
 
     private int size = 100;
 
-    @Bean
+    @Bean(name = "settlementJob")
     public Job firstJob() {
         log.info("first job");
         return new JobBuilder("firstJob", jobRepository)
@@ -72,6 +72,7 @@ public class SettlementBatchConfig {
 
         LocalDate today = LocalDate.now();
         String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        log.info("today : {}" , todayStr);
         boolean hasMoreData = true;
 
         while (hasMoreData) {

@@ -9,8 +9,8 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 public class WaitingBatch {
 
     private final JobLauncher jobLauncher;
-    private final Job waitingCountJob;
+    @Qualifier("waitingJob")
+    private Job waitingCountJob;
 
     @Scheduled(fixedRate = 1000L)
     public void runBatchJob() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
