@@ -20,11 +20,7 @@ public class Store extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private RegionCategory region;
-
-    @Enumerated(EnumType.STRING)
-    private FoodCategory foodType;
+    private String districtCategory;
 
     private String image;
 

@@ -10,16 +10,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
 @RequestMapping("/payment")
 @RestController
 public class PaymentController {
 
     private final JobLauncher jobLauncher;
     private final JobRepository jobRepository;
+    private final Job firstJob;
 
-    @Qualifier("settlementJob")
-    private Job firstJob;
+    public PaymentController(JobLauncher jobLauncher , JobRepository jobRepository , @Qualifier("settlementJob") Job firstJob) {
+        this.jobLauncher = jobLauncher;
+        this.jobRepository = jobRepository;
+        this.firstJob = firstJob;
+    }
 
     @GetMapping
     public String payment() {

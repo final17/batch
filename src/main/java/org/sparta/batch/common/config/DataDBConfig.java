@@ -36,12 +36,20 @@ public class DataDBConfig {
 
         em.setDataSource(dataDBSource());
         em.setPackagesToScan(new String[]{"org.sparta.batch.domain"});  // Entity
-        em. setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        vendorAdapter.setShowSql(true);
+        vendorAdapter.setGenerateDdl(false);  // Schema 자동 생성 비활성화
+        em.setJpaVendorAdapter(vendorAdapter);
 
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties.put("hibernate.hbm2ddl.auto", "update");
+        properties.put("hibernate.auto_quote_keyword", "true");
+        properties.put("hibernate.highlight_sql", "true");
         properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.put("hibernate.physical_naming_strategy", "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
+        properties.put("hibernate.implicit_naming_strategy", "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy");
         em.setJpaPropertyMap(properties);
 
         return em;

@@ -13,6 +13,8 @@ import org.sparta.batch.domain.user.entity.User;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -28,9 +30,6 @@ public class Settlement extends Timestamped {
 
     @Column(nullable = false)
     private String paymentKey; // 결제의 키 값
-
-    @Column(nullable = false)
-    private String transactionKey; // 거래의 키 값(승인 거래와 취소 거래하는데 사용)
 
     @Column(nullable = false , unique = true)
     private String orderId;     // 주문번호
@@ -66,10 +65,12 @@ public class Settlement extends Timestamped {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @OneToMany(mappedBy = "settlement")
+    private List<SettlementFees> settlementFeesList = new ArrayList<>();
+
     @Builder
     public Settlement(String mId ,
                       String paymentKey ,
-                      String transactionKey ,
                       String orderId ,
                       String currency ,
                       PaymentMethod method ,
@@ -82,7 +83,6 @@ public class Settlement extends Timestamped {
                       Store store ) {
         this.mId = mId;
         this.paymentKey = paymentKey;
-        this.transactionKey = transactionKey;
         this.orderId = orderId;
         this.currency = currency;
         this.method = method;

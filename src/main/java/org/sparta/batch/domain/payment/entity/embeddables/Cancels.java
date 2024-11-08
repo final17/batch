@@ -1,5 +1,6 @@
 package org.sparta.batch.domain.payment.entity.embeddables;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.time.OffsetDateTime;
 public class Cancels {
     private String transactionKey; // 취소 건의 키 값
     private String cancelReason;   // 취소 사유
+    @Column(name = "canceled_at")
     private OffsetDateTime canceledAt; // 취소 날짜와 시간 정보
     private int cancelEasyPayDiscountAmount; // 간편결제 서비스의 포인트
     private Long cancelAmount;  // 취소 금액

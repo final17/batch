@@ -18,12 +18,11 @@ import java.util.List;
 public class SettlementDto {
     private String mId;                 // 상점아이디(MID)
     private String paymentKey;          // 결제의 키 값
-    private String transactionKey;      // 거래의 키 값(승인 거래와 취소 거래하는데 사용)
     private String orderId;             // 주문번호
     private String currency;            // 결제할때 사용한 통화
     private PaymentMethod method;       // 결제수단 : 카드 , 가상계좌 , 간편결제 , 휴대폰 , 계좌이체 , 문화상품권
     private Long amount;                // 결제금액
-    private OffsetDateTime approvedAt;  // 승인날짜
+    private String approvedAt;          // 승인날짜
     private LocalDate soldDate;         // 지급 금액의 정산 기준이 되는 정산 매출일
     private LocalDate paidOutDate;      // 지급 금액을 상점에 지급할 정산 지급일
     private List<SettlementFeesDto> settlementFeesDtos;  // List<JSON [type , fee]>
