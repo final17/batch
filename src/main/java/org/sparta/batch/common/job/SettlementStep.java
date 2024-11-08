@@ -32,7 +32,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class SettlementFirstStep {
+public class SettlementStep {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
@@ -44,19 +44,19 @@ public class SettlementFirstStep {
     private final Converter converter;
 
     @Bean
-    public Step firstStep() {
-        log.info("first step");
-        return new StepBuilder("firstStep", jobRepository)
+    public Step settleStep() {
+        log.info("settle step");
+        return new StepBuilder("settleStep", jobRepository)
                 .<PaymentDto, SettlementDto> chunk(10, platformTransactionManager)
-                .reader(firstReader())
-                .processor(firstProcessor())
-                .writer(firstWriter())
+                .reader(settleReader())
+                .processor(settleProcessor())
+                .writer(settleWriter())
                 .build();
     }
 
     @Bean
-    public ItemReader<PaymentDto> firstReader() {
-        log.info("firstReader");
+    public ItemReader<PaymentDto> settleReader() {
+        log.info("settleReader");
         LocalDate today = LocalDate.now();
         String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
@@ -67,8 +67,8 @@ public class SettlementFirstStep {
     }
 
     @Bean
-    public ItemProcessor<PaymentDto, SettlementDto> firstProcessor() {
-        log.info("firstProcessor");
+    public ItemProcessor<PaymentDto, SettlementDto> settleProcessor() {
+        log.info("settleProcessor");
         return paymentDto -> {
             // SettlementDto 생성
             SettlementDto settlementDto = new SettlementDto();
@@ -94,8 +94,8 @@ public class SettlementFirstStep {
     }
 
     @Bean
-    public ItemWriter<SettlementDto> firstWriter() {
-        log.info("firstWriter");
+    public ItemWriter<SettlementDto> settleWriter() {
+        log.info("settleWriter");
         return items -> items.forEach(settlementDto -> {
             LocalDate date = LocalDate.parse(settlementDto.getApprovedAt(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             OffsetDateTime offsetDateTime = date.atStartOfDay(ZoneOffset.UTC).toOffsetDateTime();

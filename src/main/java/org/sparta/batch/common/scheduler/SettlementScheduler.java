@@ -19,19 +19,45 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class SettlementScheduler {
     private final JobLauncher jobLauncher;
-    private final Job job;
+    private final Job job1;
+    private final Job job2;
+    private final Job job3;
 
-    public SettlementScheduler(JobLauncher jobLauncher , @Qualifier("settlementJob") Job job) {
+    public SettlementScheduler(JobLauncher jobLauncher ,
+                               @Qualifier("settlementJob") Job job1,
+                               @Qualifier("settlementSummaryWeek") Job job2,
+                               @Qualifier("settlementSummaryMonth") Job job3
+    ) {
         this.jobLauncher = jobLauncher;
-        this.job = job;
+        this.job1 = job1;
+        this.job2 = job2;
+        this.job3 = job3;
     }
 
-    @Scheduled(cron = "* * 23 * * *")
-    public void runBatchJob() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    @Scheduled(cron = "0 0 23 * * *")
+    public void runBatchJob1() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())
                 .toJobParameters();
 
-        jobLauncher.run(job, jobParameters);
+        jobLauncher.run(job1, jobParameters);
+    }
+
+    @Scheduled(cron = "0 0 23 * * MON")
+    public void runBatchJob2() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("timeStamp", System.currentTimeMillis())
+                .toJobParameters();
+
+        jobLauncher.run(job2, jobParameters);
+    }
+
+    @Scheduled(cron = "0 0 23 1 * *")
+    public void runBatchJob3() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("timeStamp", System.currentTimeMillis())
+                .toJobParameters();
+
+        jobLauncher.run(job3, jobParameters);
     }
 }
