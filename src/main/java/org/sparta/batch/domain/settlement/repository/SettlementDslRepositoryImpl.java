@@ -10,6 +10,8 @@ import org.sparta.batch.domain.settlement.dto.SettlementSummaryDto;
 import org.sparta.batch.domain.settlement.entity.QSettlement;
 import org.sparta.batch.domain.settlement.entity.QSettlementFees;
 import org.sparta.batch.domain.settlement.enums.SummaryType;
+import org.sparta.batch.domain.store.entity.QStore;
+import org.sparta.batch.domain.user.entity.QUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +26,8 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
     public List<SettlementSummaryDto> getSettlementSummary(SummaryType type, String startDate, String endDate) {
         QSettlement s = QSettlement.settlement;
         QSettlementFees sf = QSettlementFees.settlementFees;
+        QUser user = QUser.user;
+        QStore store = QStore.store;
 
         String template = switch (type) {
             case DAY -> "DATE_FORMAT({0}, '%Y-%m-%d')";
@@ -38,11 +42,15 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
                                 Expressions.dateTemplate(String.class, template, s.approvedAt).as("summaryDate"),
                                 s.amount.sum().as("totalAmount"),
                                 sf.supplyAmount.sum().as("totalFee"),
-                                s.id.countDistinct().as("totalTransactions")
+                                s.id.countDistinct().as("totalTransactions"),
+                                user,
+                                store
                         )
                 )
                 .from(s)
                 .innerJoin(sf).on(sf.settlement.id.eq(s.id))
+                .innerJoin(user).on(user.id.eq(s.user.id))
+                .innerJoin(store).on(store.id.eq(s.store.id))
                 .where(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).between(startDate, endDate))
                 .groupBy(Expressions.dateTemplate(String.class, template, s.approvedAt))
                 .orderBy(Expressions.dateTemplate(String.class, template, s.approvedAt).asc())

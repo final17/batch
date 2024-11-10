@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sparta.batch.common.entity.Timestamped;
 import org.sparta.batch.domain.settlement.enums.SummaryType;
-
-import java.time.LocalDate;
+import org.sparta.batch.domain.store.entity.Store;
+import org.sparta.batch.domain.user.entity.User;
 
 @Getter
 @Entity
@@ -34,11 +34,21 @@ public class SettlementSummary extends Timestamped {
     @Column(nullable = false)
     private Long totalTransactions; // 집계된 총 거래수
 
-    public SettlementSummary(String summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
+
+    public SettlementSummary(String summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions , User user , Store store) {
         this.summaryDate = summaryDate;
         this.type = type;
         this.totalAmount = totalAmount;
         this.totalFee = totalFee;
         this.totalTransactions = totalTransactions;
+        this.user = user;
+        this.store = store;
     }
 }

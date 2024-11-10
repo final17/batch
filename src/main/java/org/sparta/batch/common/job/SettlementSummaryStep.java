@@ -57,7 +57,7 @@ public class SettlementSummaryStep {
 
                 List<SettlementSummary> settlementSummaries = new ArrayList<>();
                 for (SettlementSummaryDto ssd : settlementSummaryDtos) {
-                    SettlementSummary settlementSummary = new SettlementSummary(ssd.getSummaryDate(), ssd.getType() , ssd.getTotalAmount() , ssd.getTotalFee() , ssd.getTotalTransactions());
+                    SettlementSummary settlementSummary = new SettlementSummary(ssd.getSummaryDate(), ssd.getType() , ssd.getTotalAmount() , ssd.getTotalFee() , ssd.getTotalTransactions() , ssd.getUser() , ssd.getStore());
                     settlementSummaries.add(settlementSummary);
                 }
                 settlementSummaryRepository.saveAll(settlementSummaries);
