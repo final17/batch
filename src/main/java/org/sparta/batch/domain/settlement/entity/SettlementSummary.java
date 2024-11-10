@@ -19,7 +19,7 @@ public class SettlementSummary extends Timestamped {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate summaryDate;  // 집계 기준 날짜
+    private String summaryDate;  // 집계 기준 날짜
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -34,7 +34,7 @@ public class SettlementSummary extends Timestamped {
     @Column(nullable = false)
     private Long totalTransactions; // 집계된 총 거래수
 
-    public SettlementSummary(LocalDate summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions) {
+    public SettlementSummary(String summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions) {
         this.summaryDate = summaryDate;
         this.type = type;
         this.totalAmount = totalAmount;

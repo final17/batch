@@ -1,5 +1,6 @@
 package org.sparta.batch.domain.settlement.repository;
 
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,10 +25,17 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
         QSettlement s = QSettlement.settlement;
         QSettlementFees sf = QSettlementFees.settlementFees;
 
+        String template = switch (type) {
+            case DAY -> "DATE_FORMAT({0}, '%Y-%m-%d')";
+            case MONTH -> "DATE_FORMAT({0}, '%Y-%m')";
+            case WEEK -> "CONCAT(YEAR({0}), '-', WEEK({0}, 1))";
+            default -> throw new IllegalArgumentException("Invalid SummaryType: " + type);
+        };
+
         List<SettlementSummaryDto> results = queryFactory
                 .select(
                         Projections.fields(SettlementSummaryDto.class,
-                                Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).as("summaryDate"),
+                                Expressions.dateTemplate(String.class, template, s.approvedAt).as("summaryDate"),
                                 s.amount.sum().as("totalAmount"),
                                 sf.supplyAmount.sum().as("totalFee"),
                                 s.id.countDistinct().as("totalTransactions")
@@ -36,8 +44,8 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
                 .from(s)
                 .innerJoin(sf).on(sf.settlement.id.eq(s.id))
                 .where(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).between(startDate, endDate))
-                .groupBy(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt))
-                .orderBy(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).asc())
+                .groupBy(Expressions.dateTemplate(String.class, template, s.approvedAt))
+                .orderBy(Expressions.dateTemplate(String.class, template, s.approvedAt).asc())
                 .fetch();
 
         for (SettlementSummaryDto dto : results) {

@@ -43,7 +43,7 @@ public class SettlementScheduler {
         jobLauncher.run(job1, jobParameters);
     }
 
-    @Scheduled(cron = "0 0 23 * * MON")
+    @Scheduled(cron = "0 0 23 * * SUN")
     public void runBatchJob2() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())
@@ -52,7 +52,7 @@ public class SettlementScheduler {
         jobLauncher.run(job2, jobParameters);
     }
 
-    @Scheduled(cron = "0 0 23 1 * *")
+    @Scheduled(cron = "0 0 23 L-1 * *")
     public void runBatchJob3() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())

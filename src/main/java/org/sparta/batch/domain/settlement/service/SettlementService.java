@@ -37,7 +37,7 @@ public class SettlementService {
                 endDt = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             }
             case MONTH -> {
-                startDt = today.minusDays(30).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                startDt = today.withDayOfMonth(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 endDt = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             }
         }
