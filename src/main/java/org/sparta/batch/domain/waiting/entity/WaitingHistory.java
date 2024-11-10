@@ -43,25 +43,6 @@ public class WaitingHistory{
     @Column(name = "waiting_time")
     private long waitingTime; // 분단위
 
-    public WaitingHistory(User user, Store store) {
-        this.user = user;
-        this.store = store;
-        this.status = WaitingStatus.REGISTERED;
-        registeredAt = LocalDateTime.now();
-    }
-
-    public void setComplete() {
-        this.status = WaitingStatus.COMPLETED;
-        completedAt = LocalDateTime.now();
-        waitingTime = Duration.between(registeredAt, completedAt).toMinutes();
-    }
-
-    public void setCanceled() {
-        this.status = WaitingStatus.CANCELED;
-        canceledAt = LocalDateTime.now();
-        waitingTime = Duration.between(registeredAt, canceledAt).toMinutes();
-    }
-
     public void setCanceled(LocalDateTime canceledAt) {
         this.status = WaitingStatus.CANCELED;
         this.canceledAt = canceledAt;
