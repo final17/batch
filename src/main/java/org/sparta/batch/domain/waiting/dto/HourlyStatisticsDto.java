@@ -1,4 +1,4 @@
-package org.sparta.batch.domain.waiting.entity.statistics;
+package org.sparta.batch.domain.waiting.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

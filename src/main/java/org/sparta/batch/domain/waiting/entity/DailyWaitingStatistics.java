@@ -1,9 +1,10 @@
-package org.sparta.batch.domain.waiting.entity.statistics;
+package org.sparta.batch.domain.waiting.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sparta.batch.domain.waiting.dto.DailyWaitingStatisticsDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

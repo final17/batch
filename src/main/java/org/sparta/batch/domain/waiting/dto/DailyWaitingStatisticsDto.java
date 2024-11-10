@@ -1,11 +1,9 @@
-package org.sparta.batch.domain.waiting.entity.statistics;
+package org.sparta.batch.domain.waiting.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor

@@ -2,8 +2,11 @@ package org.sparta.batch.common.job;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.sparta.batch.domain.store.entity.Store;
+import org.sparta.batch.domain.waiting.dto.DailyWaitingStatisticsDto;
+import org.sparta.batch.domain.waiting.dto.HourlyStatisticsDto;
+import org.sparta.batch.domain.waiting.entity.DailyWaitingStatistics;
+import org.sparta.batch.domain.waiting.entity.HourlyWaitingStatistics;
 import org.sparta.batch.domain.waiting.entity.WaitingHistory;
-import org.sparta.batch.domain.waiting.entity.statistics.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -20,12 +23,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Map;
 
 @Configuration
@@ -91,7 +92,7 @@ public class WaitingStatisticsBatch {
                 .entityManagerFactory(entityManagerFactory)
                 .parameterValues(Map.of("targetDate", targetDate))
                 .queryString("""
-                        SELECT new org.sparta.batch.domain.waiting.entity.statistics.HourlyStatisticsDto(
+                        SELECT new org.sparta.batch.domain.waiting.dto.HourlyStatisticsDto(
                             w.store.id,
                             HOUR(w.registeredAt),
                             COUNT(CASE WHEN w.status IN ('COMPLETED', 'CANCELED') THEN 1 ELSE NULL END),
@@ -172,7 +173,7 @@ public class WaitingStatisticsBatch {
                 .entityManagerFactory(entityManagerFactory)
                 .parameterValues(Map.of("targetDate", targetDate))
                 .queryString("""
-                        SELECT new org.sparta.batch.domain.waiting.entity.statistics.DailyWaitingStatisticsDto(
+                        SELECT new org.sparta.batch.domain.waiting.dto.DailyWaitingStatisticsDto(
                             w.store.id,
                             :targetDate,
                              COUNT(CASE WHEN w.status IN ('COMPLETED', 'CANCELED') THEN 1 ELSE NULL END),
