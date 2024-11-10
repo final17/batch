@@ -19,16 +19,16 @@ public class DailyWaitingStatistics {
     private Long id;
 
     private Long storeId;
-    private LocalDate date; // 통계 날짜
+    private LocalDate date;
 
-    private long totalWaitingCount; // 하루 동안 총 대기 인원 수
-    private long completedCount; // 완료된 대기 건수
-    private long canceledCount; // 취소된 대기 건수
+    private long totalWaitingCount;
+    private long completedCount;
+    private long canceledCount;
 
 
-    private double averageWaitingTime; // 하루 평균 대기 시간
+    private double averageWaitingTime;
 
-    private double cancellationRate; // 취소율 (퍼센트)
+    private double cancellationRate; // 00%
 
     private LocalDateTime createdAt;
 
@@ -53,7 +53,7 @@ public class DailyWaitingStatistics {
         this.averageWaitingTime = dto.getAverageWaitingTime();
         this.cancellationRate = this.totalWaitingCount > 0
                 ? (double) this.canceledCount * 100 / this.totalWaitingCount
-                : 0.0;
+                : 0;
         this.createdAt = LocalDateTime.now();
     }
 }

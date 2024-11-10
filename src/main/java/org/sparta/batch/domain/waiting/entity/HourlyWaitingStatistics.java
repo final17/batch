@@ -21,21 +21,21 @@ public class HourlyWaitingStatistics {
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
 
-    private LocalDate date; // 통계 날짜
-    private int hour; // 시간대 (0~23)
+    private LocalDate date;
+    private int hour;
 
     @Setter
-    private int totalWaitingCount; // 해당 시간대 총 대기 인원 수
+    private int totalWaitingCount;
     @Setter
-    private int completedCount; // 완료된 대기 건수
+    private int completedCount;
     @Setter
-    private int canceledCount; // 취소된 대기 건수
+    private int canceledCount;
     @Setter
-    private int maxWaitingTime; // 최대 대기 시간 (분 단위)
+    private int maxWaitingTime;
     @Setter
-    private int minWaitingTime; // 최소 대기 시간 (분 단위)
+    private int minWaitingTime;
     @Setter
-    private double averageWaitingTime; // 평균 대기 시간
+    private double averageWaitingTime;
 
     private LocalDateTime createdAt;
 }
