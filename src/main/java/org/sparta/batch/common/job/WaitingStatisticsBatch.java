@@ -1,6 +1,8 @@
 package org.sparta.batch.common.job;
 
 import jakarta.persistence.EntityManagerFactory;
+import org.redisson.api.RKeys;
+import org.redisson.api.RedissonClient;
 import org.sparta.batch.domain.store.entity.Store;
 import org.sparta.batch.domain.waiting.dto.DailyWaitingStatisticsDto;
 import org.sparta.batch.domain.waiting.dto.HourlyStatisticsDto;
@@ -19,12 +21,15 @@ import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -32,10 +37,30 @@ import java.util.Map;
 @Configuration
 public class WaitingStatisticsBatch {
 
+    @Bean("waitingNumberReset")
+    @JobScope
+    public Step waitingNumberReset(JobRepository jobRepository,   @Qualifier("dataTransactionManager") PlatformTransactionManager transactionManager, RedissonClient redissonClient) {
+        return new StepBuilder("waitingNumberReset", jobRepository)
+                .tasklet(((contribution, chunkContext) ->
+                        {
+                            // 웨이팅 대기열 관련 키 삭제
+                            RKeys keys = redissonClient.getKeys();
+                            keys.deleteByPattern("waitingQueue:store:*");
+                            keys.deleteByPattern("waitingQueue:user:*");
+                            keys.deleteByPattern("waiting:store:*");
+                            
+                            // todo 이부분 윤서님꺼여가지고 상의해봐야함
+                            keys.deleteByPattern("store:waiting_rank*");
+                            return RepeatStatus.FINISHED;
+                        }),
+                        transactionManager)
+                .build();
+    }
+
 
     @Bean(name = "autoCancelRegisteredWaitingReader")
     @StepScope
-    JpaPagingItemReader<WaitingHistory> autoCancelRegisteredWaitingReader(EntityManagerFactory entityManagerFactory,
+    public JpaPagingItemReader<WaitingHistory> autoCancelRegisteredWaitingReader(EntityManagerFactory entityManagerFactory,
                                                                    @Value("#{jobParameters['targetDate']}") LocalDate targetDate) {
         // 해당 집계일에 아직 registered상태면 모두 Canceled로 바꿔준다.
         return new JpaPagingItemReaderBuilder<WaitingHistory>()
@@ -98,9 +123,10 @@ public class WaitingStatisticsBatch {
                             COUNT(CASE WHEN w.status IN ('COMPLETED', 'CANCELED') THEN 1 ELSE NULL END),
                             COUNT(CASE WHEN w.status = 'COMPLETED' THEN 1 ELSE NULL END),
                             COUNT(CASE WHEN w.status = 'CANCELED' THEN 1 ELSE NULL END),
-                            COALESCE(MAX(w.waitingTime), 0),
-                            COALESCE(MIN(w.waitingTime), 0),
+                            COALESCE(MAX(CASE WHEN w.status = 'COMPLETED' THEN w.waitingTime ELSE NULL END), 0),
+                            COALESCE(MIN(CASE WHEN w.status = 'COMPLETED' THEN w.waitingTime ELSE NULL END), 0),
                             COALESCE(AVG(CASE WHEN w.status = 'COMPLETED' THEN w.waitingTime ELSE NULL END), 0),
+                            COALESCE(AVG(CASE WHEN w.status = 'CANCELED' THEN w.waitingTime ELSE NULL END), 0),
                             w.store.isDeleted
                         )
                         FROM WaitingHistory w
@@ -124,7 +150,8 @@ public class WaitingStatisticsBatch {
             int canceledCount = (int)item.getCanceledCount();
             int maxWaitingTime = (int) item.getMaxWaitingTime();
             int minWaitingTime = (int) item.getMinWaitingTime();
-            double averageWaitingTime = item.getAverageWaitingTime();
+            double completedAverageWaitingTime = BigDecimal.valueOf(item.getCompletedAverageWaitingTime()).setScale(1, RoundingMode.HALF_UP).doubleValue();
+            double canceledAverageWaitingTime = BigDecimal.valueOf(item.getCanceledAverageWaitingTime()).setScale(1, RoundingMode.HALF_UP).doubleValue();
 
             return HourlyWaitingStatistics.builder()
                     .store(new Store(storeId))
@@ -134,7 +161,8 @@ public class WaitingStatisticsBatch {
                     .canceledCount(canceledCount)
                     .maxWaitingTime(maxWaitingTime)
                     .minWaitingTime(minWaitingTime)
-                    .averageWaitingTime(averageWaitingTime)
+                    .completedAverageWaitingTime(completedAverageWaitingTime)
+                    .canceledAverageWaitingTime(canceledAverageWaitingTime)
                     .createdAt(LocalDateTime.now())
                     .date(LocalDate.now().minusDays(1))
                     .build();
@@ -180,6 +208,7 @@ public class WaitingStatisticsBatch {
                              COUNT(CASE WHEN w.status = 'COMPLETED' THEN 1 ELSE NULL END),
                              COUNT(CASE WHEN w.status = 'CANCELED' THEN 1 ELSE NULL END),
                             COALESCE(AVG(CASE WHEN w.status = 'COMPLETED' THEN w.waitingTime ELSE NULL END), 0),
+                            COALESCE(AVG(CASE WHEN w.status = 'CANCELED' THEN w.waitingTime ELSE NULL END), 0),
                             w.store.isDeleted
                         )
                         FROM WaitingHistory w
@@ -222,11 +251,13 @@ public class WaitingStatisticsBatch {
 
     @Bean
     public Job waitingStatisticsJob(JobRepository jobRepository,
+                                      Step waitingNumberReset,
                                       Step autoCancelRegisteredWaitingStep,
                                       Step hourlyWaitingStatisticsStep,
                                       Step dailyWaitingStatisticsStep) {
         return new JobBuilder("waitingStatisticsJob", jobRepository)
-                .start(autoCancelRegisteredWaitingStep)
+                .start(waitingNumberReset)
+                .next(autoCancelRegisteredWaitingStep)
                 .next(hourlyWaitingStatisticsStep)
                 .next(dailyWaitingStatisticsStep)
                 .build();

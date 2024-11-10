@@ -13,11 +13,12 @@ public class HourlyStatisticsDto {
     private long canceledCount;
     private long maxWaitingTime;
     private long minWaitingTime;
-    private double averageWaitingTime;
+    private double completedAverageWaitingTime;
+    private double canceledAverageWaitingTime;
     private boolean isDeleted;
 
     public HourlyStatisticsDto(Long storeId, int hour, long totalWaitingCount, long completedCount,
-                               long canceledCount, long maxWaitingTime, long minWaitingTime, double averageWaitingTime, boolean isDeleted) {
+                               long canceledCount, long maxWaitingTime, long minWaitingTime, double completedAverageWaitingTime , double canceledAverageWaitingTime, boolean isDeleted) {
         this.storeId = storeId;
         this.hour = hour;
         this.totalWaitingCount = totalWaitingCount;
@@ -25,7 +26,8 @@ public class HourlyStatisticsDto {
         this.canceledCount = canceledCount;
         this.maxWaitingTime = maxWaitingTime;
         this.minWaitingTime = minWaitingTime;
-        this.averageWaitingTime = averageWaitingTime;
+        this.completedAverageWaitingTime = completedAverageWaitingTime ;
+        this.canceledAverageWaitingTime = canceledAverageWaitingTime;
         this.isDeleted = isDeleted;
     }
 }

@@ -21,8 +21,8 @@ public class WaitingScheduler {
     private final JobLauncher  jobLauncher;
     private final Job waitingStatisticsJob;
 
-    //@Scheduled(fixedRate = 10000L)
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(fixedRate = 10000L)
+    //@Scheduled(cron = "0 0 0 * * ?")
     public void schedule() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLocalDate("targetDate", LocalDate.now().minusDays(1))

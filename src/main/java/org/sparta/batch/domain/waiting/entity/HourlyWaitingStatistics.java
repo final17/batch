@@ -19,6 +19,7 @@ public class HourlyWaitingStatistics {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     private LocalDate date;
@@ -35,7 +36,9 @@ public class HourlyWaitingStatistics {
     @Setter
     private int minWaitingTime;
     @Setter
-    private double averageWaitingTime;
+    private double completedAverageWaitingTime;
+    @Setter
+    private double canceledAverageWaitingTime;
 
     private LocalDateTime createdAt;
 }
