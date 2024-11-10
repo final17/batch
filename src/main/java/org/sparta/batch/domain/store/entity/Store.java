@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sparta.batch.common.entity.Timestamped;
-import org.sparta.batch.domain.store.category.FoodCategory;
-import org.sparta.batch.domain.store.category.RegionCategory;
+import org.sparta.batch.domain.store.category.DistrictCategory;
 import org.sparta.batch.domain.user.entity.User;
 
 import java.time.LocalTime;
@@ -20,7 +19,8 @@ public class Store extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String districtCategory;
+    @Enumerated(EnumType.STRING)
+    private DistrictCategory districtCategory;
 
     private String image;
 
@@ -67,4 +67,8 @@ public class Store extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User user;
+
+    public Store (Long id) {
+        this.id = id;
+    }
 }

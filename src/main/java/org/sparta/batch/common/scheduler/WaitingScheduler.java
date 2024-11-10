@@ -1,7 +1,6 @@
-package org.sparta.batch.domain.waiting_statistics.shedule;
+package org.sparta.batch.common.scheduler;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -10,27 +9,25 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Slf4j
+import java.time.LocalDate;
+
 @Component
-@EnableScheduling
 @RequiredArgsConstructor
-public class WaitingBatch {
+public class WaitingScheduler {
 
-    private final JobLauncher jobLauncher;
-    @Qualifier("waitingJob")
-    private Job waitingCountJob;
+    private final JobLauncher  jobLauncher;
+    private final Job waitingStatisticsJob;
 
-//    @Scheduled(fixedRate = 1000L)
-    public void runBatchJob() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
-        log.info("잡 실행!");
+    // @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(fixedRate = 10000L)
+    public void schedule() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addLong("timeStamp", System.currentTimeMillis())
+                .addLocalDate("targetDate", LocalDate.now().minusDays(1))
                 .toJobParameters();
 
-        jobLauncher.run(waitingCountJob, jobParameters);
+        jobLauncher.run(waitingStatisticsJob, jobParameters);
     }
 }
