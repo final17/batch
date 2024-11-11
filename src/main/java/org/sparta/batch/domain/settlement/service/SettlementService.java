@@ -24,7 +24,6 @@ public class SettlementService {
     }
 
     private String[] getDt(SummaryType summaryType) {
-        log.info(summaryType.name());
         LocalDate today = LocalDate.now();
         String startDt = "";
         String endDt = "";

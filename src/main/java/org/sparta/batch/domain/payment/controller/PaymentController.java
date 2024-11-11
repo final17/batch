@@ -20,7 +20,7 @@ public class PaymentController {
     private final JobRepository jobRepository;
     private final Job firstJob;
 
-    public PaymentController(JobLauncher jobLauncher , JobRepository jobRepository , @Qualifier("settlementJob") Job firstJob) {
+    public PaymentController(JobLauncher jobLauncher , JobRepository jobRepository , @Qualifier("settlementSummaryWeek") Job firstJob) {
         this.jobLauncher = jobLauncher;
         this.jobRepository = jobRepository;
         this.firstJob = firstJob;
@@ -31,7 +31,7 @@ public class PaymentController {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("timeStamp", System.currentTimeMillis())
-                    .addString("type" , SummaryType.DAY.name())
+                    .addString("type" , SummaryType.WEEK.name())
                     .toJobParameters();
 
             jobLauncher.run(firstJob, jobParameters);

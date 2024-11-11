@@ -1,6 +1,5 @@
 package org.sparta.batch.domain.settlement.repository;
 
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,7 +12,6 @@ import org.sparta.batch.domain.settlement.enums.SummaryType;
 import org.sparta.batch.domain.store.entity.QStore;
 import org.sparta.batch.domain.user.entity.QUser;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -29,19 +27,19 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
         QUser user = QUser.user;
         QStore store = QStore.store;
 
-        log.info("getSettlementSummary : {}" , type.name());
-
         String template = switch (type) {
             case DAY -> "DATE_FORMAT({0}, '%Y-%m-%d')";
             case MONTH -> "DATE_FORMAT({0}, '%Y-%m')";
-            case WEEK -> "CONCAT(YEAR({0}), '-', WEEK({0}, 1))";
+            case WEEK -> "CONCAT(YEAR({0}), '-', WEEK({0}))";
             default -> throw new IllegalArgumentException("Invalid SummaryType: " + type);
         };
 
         List<SettlementSummaryDto> results = queryFactory
                 .select(
-                        Projections.fields(SettlementSummaryDto.class,
-                                Expressions.dateTemplate(String.class, template, s.approvedAt).as("summaryDate"),
+                        Projections.constructor(SettlementSummaryDto.class,
+                                type == SummaryType.WEEK
+                                        ? Expressions.stringTemplate(template, s.approvedAt)
+                                        : Expressions.dateTemplate(String.class, template, s.approvedAt),
                                 s.amount.sum().as("totalAmount"),
                                 sf.supplyAmount.sum().as("totalFee"),
                                 s.id.countDistinct().as("totalTransactions"),
@@ -54,8 +52,12 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
                 .innerJoin(user).on(user.id.eq(s.user.id))
                 .innerJoin(store).on(store.id.eq(s.store.id))
                 .where(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).between(startDate, endDate))
-                .groupBy(Expressions.dateTemplate(String.class, template, s.approvedAt))
-                .orderBy(Expressions.dateTemplate(String.class, template, s.approvedAt).asc())
+                .groupBy(type == SummaryType.WEEK
+                        ? Expressions.stringTemplate(template, s.approvedAt)
+                        : Expressions.dateTemplate(String.class, template, s.approvedAt))
+                .orderBy(type == SummaryType.WEEK
+                        ? Expressions.stringTemplate(template, s.approvedAt).asc()
+                        : Expressions.dateTemplate(String.class, template, s.approvedAt).asc())
                 .fetch();
 
         for (SettlementSummaryDto dto : results) {
