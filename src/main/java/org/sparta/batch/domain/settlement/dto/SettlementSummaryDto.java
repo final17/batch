@@ -16,16 +16,16 @@ public class SettlementSummaryDto {
     private Long totalAmount;       // 집계된 총 결제 금액
     private Long totalFee;          // 집계된 총 수수료
     private Long totalTransactions; // 집계된 총 거래수
-    private User user;
-    private Store store;
+    private Long userId;
+    private Long storeId;
 
-    public SettlementSummaryDto(String summaryDate, Long totalAmount , Long totalFee , Long totalTransactions , User user, Store store) {
+    public SettlementSummaryDto(String summaryDate, Long totalAmount , Long totalFee , Long totalTransactions , Long userId, Long storeId) {
         this.summaryDate = summaryDate;
         this.totalAmount = totalAmount;
         this.totalFee = totalFee;
         this.totalTransactions = totalTransactions;
-        this.user = user;
-        this.store = store;
+        this.userId = userId;
+        this.storeId = storeId;
     }
 
     public void updateType(SummaryType type) {

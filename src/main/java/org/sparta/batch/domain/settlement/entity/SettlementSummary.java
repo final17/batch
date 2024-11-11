@@ -34,21 +34,17 @@ public class SettlementSummary extends Timestamped {
     @Column(nullable = false)
     private Long totalTransactions; // 집계된 총 거래수
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
+    private Long storeId;
 
-    public SettlementSummary(String summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions , User user , Store store) {
+    public SettlementSummary(String summaryDate , SummaryType type , Long totalAmount , Long totalFee , Long totalTransactions , Long userId , Long storeId) {
         this.summaryDate = summaryDate;
         this.type = type;
         this.totalAmount = totalAmount;
         this.totalFee = totalFee;
         this.totalTransactions = totalTransactions;
-        this.user = user;
-        this.store = store;
+        this.userId = userId;
+        this.storeId = storeId;
     }
 }

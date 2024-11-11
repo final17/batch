@@ -43,8 +43,8 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
                                 s.amount.sum().as("totalAmount"),
                                 sf.supplyAmount.sum().as("totalFee"),
                                 s.id.countDistinct().as("totalTransactions"),
-                                user,
-                                store
+                                user.id.max().as("userId"),
+                                store.id.min().as("storeId")
                         )
                 )
                 .from(s)
