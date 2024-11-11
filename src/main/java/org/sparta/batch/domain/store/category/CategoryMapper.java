@@ -9,6 +9,12 @@ public interface CategoryMapper {
     String getCode();
 
     /**
+     * 카테고리 타입 반환
+     * @return
+     */
+    String getType();
+
+    /**
      * 카테고리 이름 반환
      * @return
      */
