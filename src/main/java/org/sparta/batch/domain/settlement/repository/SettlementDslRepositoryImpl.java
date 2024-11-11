@@ -29,6 +29,8 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
         QUser user = QUser.user;
         QStore store = QStore.store;
 
+        log.info("getSettlementSummary : {}" , type.name());
+
         String template = switch (type) {
             case DAY -> "DATE_FORMAT({0}, '%Y-%m-%d')";
             case MONTH -> "DATE_FORMAT({0}, '%Y-%m')";

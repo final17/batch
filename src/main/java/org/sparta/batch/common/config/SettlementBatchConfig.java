@@ -25,7 +25,6 @@ public class SettlementBatchConfig {
     @Bean(name = "settlementJob")
     public Job settlementJob() {
         log.info("settlement job");
-        settlementSummaryStep.summaryType(SummaryType.DAY);
         return new JobBuilder("settlementJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(settlementStep.settleStep())
@@ -36,7 +35,6 @@ public class SettlementBatchConfig {
     @Bean(name = "settlementSummaryWeek")
     public Job summaryWeekJob() {
         log.info("summaryWeek job");
-        settlementSummaryStep.summaryType(SummaryType.WEEK);
         return new JobBuilder("summaryWeekJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(settlementSummaryStep.summaryStep())
@@ -46,7 +44,6 @@ public class SettlementBatchConfig {
     @Bean(name = "settlementSummaryMonth")
     public Job summaryMonthJob() {
         log.info("summaryMonth job");
-        settlementSummaryStep.summaryType(SummaryType.MONTH);
         return new JobBuilder("summaryMonthJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(settlementSummaryStep.summaryStep())

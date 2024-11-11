@@ -1,6 +1,7 @@
 package org.sparta.batch.common.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.sparta.batch.domain.settlement.enums.SummaryType;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -38,6 +39,7 @@ public class SettlementScheduler {
     public void runBatchJob1() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())
+                .addString("type" , SummaryType.DAY.name())
                 .toJobParameters();
 
         jobLauncher.run(job1, jobParameters);
@@ -47,6 +49,7 @@ public class SettlementScheduler {
     public void runBatchJob2() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())
+                .addString("type" , SummaryType.WEEK.name())
                 .toJobParameters();
 
         jobLauncher.run(job2, jobParameters);
@@ -56,6 +59,7 @@ public class SettlementScheduler {
     public void runBatchJob3() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("timeStamp", System.currentTimeMillis())
+                .addString("type" , SummaryType.MONTH.name())
                 .toJobParameters();
 
         jobLauncher.run(job3, jobParameters);

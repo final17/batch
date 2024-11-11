@@ -1,6 +1,7 @@
 package org.sparta.batch.common.job;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.sparta.batch.domain.settlement.dto.SettlementSummaryDto;
 import org.sparta.batch.domain.settlement.entity.SettlementSummary;
@@ -32,11 +33,6 @@ public class SettlementSummaryStep {
 
     private final SettlementService settlementService;
     private final SettlementSummaryRepository settlementSummaryRepository;
-    private SummaryType summaryType;
-
-    public void summaryType(SummaryType summaryType) {
-        this.summaryType = summaryType;
-    }
 
     @Bean
     public Step summaryStep() {
@@ -53,7 +49,10 @@ public class SettlementSummaryStep {
             public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
                 // 정산 작업 수행
                 log.info("Executing settlement tasklet...");
-                List<SettlementSummaryDto> settlementSummaryDtos = settlementService.getSettlementSummary(summaryType);
+
+                String type = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("type");
+
+                List<SettlementSummaryDto> settlementSummaryDtos = settlementService.getSettlementSummary(SummaryType.of(type));
 
                 List<SettlementSummary> settlementSummaries = new ArrayList<>();
                 for (SettlementSummaryDto ssd : settlementSummaryDtos) {
