@@ -2,6 +2,8 @@ package org.sparta.batch.domain.settlement.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,6 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
     @Override
     public List<SettlementSummaryDto> getSettlementSummary(SummaryType type, String startDate, String endDate) {
         QSettlement s = QSettlement.settlement;
-        QSettlementFees sf = QSettlementFees.settlementFees;
         QUser user = QUser.user;
         QStore store = QStore.store;
 
@@ -34,6 +35,14 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
             default -> throw new IllegalArgumentException("Invalid SummaryType: " + type);
         };
 
+        QSettlement ss = QSettlement.settlement;
+        QSettlementFees sf = QSettlementFees.settlementFees;
+        JPQLQuery<Long> subquery = JPAExpressions
+                .select(sf.supplyAmount.sum())
+                .from(ss)
+                .innerJoin(sf).on(sf.settlement.id.eq(ss.id))
+                .where(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", ss.approvedAt).between(startDate, endDate));
+
         List<SettlementSummaryDto> results = queryFactory
                 .select(
                         Projections.constructor(SettlementSummaryDto.class,
@@ -41,14 +50,13 @@ public class SettlementDslRepositoryImpl implements SettlementDslRepository {
                                         ? Expressions.stringTemplate(template, s.approvedAt)
                                         : Expressions.dateTemplate(String.class, template, s.approvedAt),
                                 s.amount.sum().as("totalAmount"),
-                                sf.supplyAmount.sum().as("totalFee"),
-                                s.id.countDistinct().as("totalTransactions"),
-                                user.id.max().as("userId"),
-                                store.id.min().as("storeId")
+                                subquery,
+                                s.id.count().as("totalTransactions"),
+                                s.user.id.max().as("userId"),
+                                s.store.id.max().as("storeId")
                         )
                 )
                 .from(s)
-                .innerJoin(sf).on(sf.settlement.id.eq(s.id))
                 .innerJoin(user).on(user.id.eq(s.user.id))
                 .innerJoin(store).on(store.id.eq(s.store.id))
                 .where(Expressions.dateTemplate(String.class, "DATE_FORMAT({0}, '%Y-%m-%d')", s.approvedAt).between(startDate, endDate))

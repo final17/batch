@@ -12,6 +12,7 @@ import org.sparta.batch.domain.settlement.entity.SettlementFees;
 import org.sparta.batch.domain.settlement.repository.SettlementFeesRepository;
 import org.sparta.batch.domain.settlement.repository.SettlementRepository;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -20,6 +21,8 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDate;
@@ -42,17 +45,30 @@ public class SettlementStep {
     private final SettlementFeesRepository settlementFeesRepository;
 
     private final Converter converter;
+    private final int chunkSize = 1;
 
     @Bean
     public Step settleStep() {
         log.info("settle step");
         return new StepBuilder("settleStep", jobRepository)
-                .<PaymentDto, SettlementDto> chunk(10, platformTransactionManager)
+                .<PaymentDto, SettlementDto> chunk(chunkSize, platformTransactionManager)
                 .reader(settleReader())
                 .processor(settleProcessor())
                 .writer(settleWriter())
                 .build();
     }
+
+//    @Bean
+//    public ItemReader<PaymentDto> settleReader() {
+//        log.info("settleReader");
+//        LocalDate today = LocalDate.now();
+//        String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        List<PaymentDto> paymentDtoList = paymentService.paymentDtoList(todayStr);
+//
+//        log.info("Total items fetched : {}" , paymentDtoList.size()); // 전체 데이터 로깅
+//        return new ListItemReader<>(paymentDtoList);
+//    }
 
     @Bean
     public ItemReader<PaymentDto> settleReader() {
@@ -60,11 +76,30 @@ public class SettlementStep {
         LocalDate today = LocalDate.now();
         String todayStr = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        List<PaymentDto> paymentDtoList = paymentService.paymentDtoList(todayStr);
+        // 페이지 번호 초기화
+        final int[] pageNumber = {1}; // 배열을 사용하여 effectively final로 유지
 
-        log.info("Total items fetched : {}" , paymentDtoList.size()); // 전체 데이터 로깅
-        return new ListItemReader<>(paymentDtoList);
+        return new ItemReader<PaymentDto>() {
+            private List<PaymentDto> currentBatch = new ArrayList<>();
+            private int currentIndex = 0;
+
+            @Override
+            public PaymentDto read() {
+                // 현재 배치가 비어있거나 인덱스가 범위를 초과하면 새로운 배치 읽기
+                if (currentBatch.isEmpty() || currentIndex >= currentBatch.size()) {
+                    currentBatch = paymentService.paymentDtoList(todayStr, pageNumber[0]++ , chunkSize);
+                    currentIndex = 0;
+
+                    // 데이터가 없으면 null 반환하여 종료
+                    if (currentBatch.isEmpty()) {
+                        return null;
+                    }
+                }
+                return currentBatch.get(currentIndex++);
+            }
+        };
     }
+
 
     @Bean
     public ItemProcessor<PaymentDto, SettlementDto> settleProcessor() {

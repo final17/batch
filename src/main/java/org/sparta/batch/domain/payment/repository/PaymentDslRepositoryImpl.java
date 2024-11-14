@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sparta.batch.domain.payment.dto.PaymentDto;
 import org.sparta.batch.domain.payment.enums.Status;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class PaymentDslRepositoryImpl implements PaymentDslRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PaymentDto> paymentList(String today) {
+    public List<PaymentDto> paymentList(String today , Pageable pageable) {
         return queryFactory
                 .select(Projections.constructor(PaymentDto.class,
                         paymentSuccess.mId,
@@ -47,6 +48,8 @@ public class PaymentDslRepositoryImpl implements PaymentDslRepository {
                 .innerJoin(user).on(user.id.eq(payment.user.id))
                 .innerJoin(store).on(store.id.eq(payment.store.id))
                 .where(todayEquals(today))
+                .offset(pageable.getOffset()) // 페이징 처리
+                .limit(pageable.getPageSize()) // 페이지 크기 설정
                 .fetch();
     }
 
