@@ -45,7 +45,7 @@ public class SettlementStep {
     private final SettlementFeesRepository settlementFeesRepository;
 
     private final Converter converter;
-    private final int chunkSize = 1;
+    private final int chunkSize = 10;
 
     @Bean
     public Step settleStep() {
