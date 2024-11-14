@@ -14,6 +14,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,22 +48,39 @@ public class SettlementSummaryStep {
         return new Tasklet() {
             @Override
             public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                // 정산 작업 수행
                 log.info("Executing settlement tasklet...");
 
+                // JobParameters에서 요약 유형 가져오기
                 String type = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("type");
+                ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();
 
+                // 마지막 처리된 인덱스 가져오기
+                int lastProcessedIndex = executionContext.containsKey("lastProcessedIndex") ?
+                        executionContext.getInt("lastProcessedIndex") : 0;
+
+                // 정산 데이터 가져오기
                 List<SettlementSummaryDto> settlementSummaryDtos = settlementService.getSettlementSummary(SummaryType.of(type));
-
-                List<SettlementSummary> settlementSummaries = new ArrayList<>();
-                for (SettlementSummaryDto ssd : settlementSummaryDtos) {
-                    SettlementSummary settlementSummary = new SettlementSummary(ssd.getSummaryDate(), ssd.getType() , ssd.getTotalAmount() , ssd.getTotalFee() , ssd.getTotalTransactions() , ssd.getUserId() , ssd.getStoreId());
-                    settlementSummaries.add(settlementSummary);
+                if (lastProcessedIndex >= settlementSummaryDtos.size()) {
+                    // 더 이상 처리할 데이터가 없는 경우 종료
+                    return RepeatStatus.FINISHED;
                 }
-                settlementSummaryRepository.saveAll(settlementSummaries);
+
+                // 남은 데이터 처리
+                for (int i = lastProcessedIndex; i < settlementSummaryDtos.size(); i++) {
+                    SettlementSummaryDto ssd = settlementSummaryDtos.get(i);
+                    SettlementSummary settlementSummary = new SettlementSummary(
+                            ssd.getSummaryDate(), ssd.getType(), ssd.getTotalAmount(),
+                            ssd.getTotalFee(), ssd.getTotalTransactions(), ssd.getUserId(), ssd.getStoreId()
+                    );
+                    settlementSummaryRepository.save(settlementSummary);
+
+                    // 마지막 처리된 인덱스 업데이트 및 저장
+                    executionContext.putInt("lastProcessedIndex", i + 1);
+                }
 
                 return RepeatStatus.FINISHED; // 작업 완료 상태 반환
             }
         };
     }
+
 }
