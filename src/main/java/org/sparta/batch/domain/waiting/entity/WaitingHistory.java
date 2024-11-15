@@ -41,7 +41,7 @@ public class WaitingHistory{
     private LocalDateTime canceledAt;
 
     @Column(name = "waiting_time")
-    private long waitingTime; // 분단위
+    private long waitingTime = 0; // 분단위
 
     public void setCanceled(LocalDateTime canceledAt) {
         this.status = WaitingStatus.CANCELED;
