@@ -2,8 +2,7 @@
 
 ## KEY Summary
 
-<details>
-<summary style="font-size: 16px; font-weight: bold">⏰ 스프링 배치 도입 </summary>
+### ⏰ 스프링 배치 도입
 
 1. **배경**
     - **스프링 배치 도입**
@@ -25,12 +24,9 @@
         - CamelCaseToUnderscoresNamingStrategy 추가 설정
         - SpringImplicitNamingStrategy 추가 설정
 
-</details>
-
 ## 기술적 고도화
 
-<details>
-<summary style="font-size:16px"><strong>⚙️ 정산 처리 자동화</strong></summary>
+### ⚙️ 정산 처리 자동화
 
 ### [문제 인식]
 
@@ -270,6 +266,3 @@
 모든 문제를 해결한 후, Spring Batch를 활용하여 정산 시스템을 성공적으로 구축하였습니다.
 이를 통해 정산 프로세스의 자동화, 효율성 향상, 데이터의 정확성을 확보할 수 있게 되었습니다.
 또한, 정산 결과에 대한 신뢰성을 높이며, 향후 데이터 처리 시 발생할 수 있는 문제들을 미리 예방할 수 있는 기반을 마련하였습니다.
-
-
-</details>
