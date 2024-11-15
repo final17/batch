@@ -27,15 +27,15 @@ public class DailyWaitingStatistics {
 
     private LocalDate date;
 
-    private long totalWaitingCount;
-    private long completedCount;
-    private long canceledCount;
+    private long totalWaitingCount = 0L;
+    private long completedCount = 0L;
+    private long canceledCount = 0L;
 
 
-    private double completedAverageWaitingTime;
-    private double canceledAverageWaitTime;
+    private double completedAverageWaitingTime = 0.0;
+    private double canceledAverageWaitTime = 0.0;
 
-    private double cancellationRate; // 00%
+    private double cancellationRate = 0.0; // 00%
 
     private LocalDateTime createdAt;
 

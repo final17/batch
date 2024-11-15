@@ -1,3 +1,4 @@
+
 spring:
   config:
     import: optional:file:.env[.properties]
@@ -23,3 +24,5 @@ spring:
 redis:
   cluster:
     nodes: "${HOST_IP}:7001,${HOST_IP}:7002,${HOST_IP}:7003,${HOST_IP}:7004,${HOST_IP}:7005,${HOST_IP}:7006"
+server:
+  port: 8081

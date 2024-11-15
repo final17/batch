@@ -23,22 +23,22 @@ public class HourlyWaitingStatistics {
     private Store store;
 
     private LocalDate date;
-    private int hour;
+    private int hour = 0;
 
     @Setter
-    private int totalWaitingCount;
+    private int totalWaitingCount = 0;
     @Setter
-    private int completedCount;
+    private int completedCount = 0;
     @Setter
-    private int canceledCount;
+    private int canceledCount = 0;
     @Setter
-    private int maxWaitingTime;
+    private int maxWaitingTime = 0;
     @Setter
-    private int minWaitingTime;
+    private int minWaitingTime = 0;
     @Setter
-    private double completedAverageWaitingTime;
+    private double completedAverageWaitingTime = 0.0;
     @Setter
-    private double canceledAverageWaitingTime;
+    private double canceledAverageWaitingTime = 0.0;
 
     private LocalDateTime createdAt;
 }
