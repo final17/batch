@@ -44,7 +44,8 @@ public class WaitingHistory{
     private long waitingTime = 0; // 분단위
 
     public void setCanceled(LocalDateTime canceledAt) {
-        this.status = WaitingStatus.CANCELED;
+        // 배치에서는 사용하는 부분이 12시 지나면 마감처리 이므로 CLOSED 설정
+        this.status = WaitingStatus.CLOSED;
         this.canceledAt = canceledAt;
         this.waitingTime = Duration.between(registeredAt, canceledAt).toMinutes();
     }
