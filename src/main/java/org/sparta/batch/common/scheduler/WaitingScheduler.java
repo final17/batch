@@ -21,7 +21,6 @@ public class WaitingScheduler {
     private final JobLauncher  jobLauncher;
     private final Job waitingStatisticsJob;
 
-    @Scheduled(fixedRate = 10000L)
     @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Seoul")
     public void schedule() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
